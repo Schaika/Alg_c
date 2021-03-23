@@ -6,8 +6,8 @@
 //вспомогательные функции
 typedef struct Node{
     int key;
-    struct Node *left;
-    struct Node *right;
+	struct Node *left;
+	struct Node *right;
 } TreeNode;
 TreeNode* insertTree(TreeNode *t, int data){
     TreeNode *newNode;
@@ -69,8 +69,8 @@ TreeNode* getSuccessor(TreeNode *node){
         current = current->left;
     }
     if(S != node->right){
-        parent->left = S->right;
-        S->right = node->right;
+		parent->left = S->right;
+		S->right = node->right;
     }
     return S;
 }
@@ -93,7 +93,7 @@ bool deleteNode(TreeNode *root, int data){
     }
     if(current->left == NULL && current->right == NULL){
         if(current == root)
-            root = NULL;
+			root = NULL;
         else if(isLeft)
             parent->left = NULL;
         else
@@ -107,30 +107,77 @@ bool deleteNode(TreeNode *root, int data){
     }
     else if(current->left == NULL){
         if(isLeft)
-            parent->left = current->right;
+			parent->left = current->right;
         else
-            parent->right = current->right;
+			parent->right = current->right;
     }
     else{
         TreeNode *successor = getSuccessor(current);
         if(current == root)
-            successor = root;
+			*root = *successor;
         else if(isLeft)
-            parent->left = successor;
+			parent->left = successor;
         else
-            parent->right = successor;
-        successor->left = current->left;
+			parent->right = successor;
+		successor->left = current->left;
     }
     return true;
 }
+
+void fillTree(int size, TreeNode *root) {
+	for (int i = 0; i < size; ++i) {
+		insertTree(root, rand() % 1000);
+	}
+}
+
+int countDepth(TreeNode *node) {
+	if (node == NULL) {
+		return 0;
+	}
+	int left = 0;
+	int right = 0;
+	if (node->left != NULL) {
+		left = countDepth(node->left);
+	}
+	if (node->right != NULL) {
+		right = countDepth(node->right);
+	}
+	return 1 + ((left > right) ? left : right);
+}
+
+bool isBalanced(TreeNode *root) {
+	return abs(countDepth(root->left) - countDepth(root->right)) <= 1;
+}
+
+TreeNode* binarySearch(TreeNode *root, int data) {
+	if (root == NULL || root->key == data)
+		return root;
+
+	if (data < root->key)
+		return binarySearch(root->left, data);
+	else
+		return binarySearch(root->right, data);
+}
+
 int main(int argc, char *argv[])
 {
-   TreeNode *root = (TreeNode*) malloc(sizeof(TreeNode));
-   root->key = 5;
-   for(int i=0;i<4;i++) insertTree(root,rand()%50);
-   printTree(root);printf("\n");
-   deleteNode(root,5);
-   deleteNode(root,5);
-   printTree(root);printf("\n");
+		const int TREES = 50;
+		const int size = 10000;
+		int balanced = 0;
+
+		for (int i = 0; i < TREES; ++i) {
+			TreeNode *node = NULL;
+			TreeNode *root = insertTree(node, rand() % 1000);
+			fillTree(size, root);
+			balanced += isBalanced(root) ? 1 : 0;
+		}
+		printf("%d%% of trees are balanced.\n", balanced * 100 / TREES);
+
+		TreeNode *node = NULL;
+		TreeNode *root = insertTree(node, rand() % 1000);
+		fillTree(75, root);
+		printTree(root);
+		int number = 512;
+		printf("\nThe number %d %s in tree.\n",number,binarySearch(root,number)?"exsists":"doesn't exsist");
    return 0;
 }
